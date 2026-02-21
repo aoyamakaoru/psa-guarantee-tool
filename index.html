@@ -3,37 +3,52 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PSA最低保証ツール</title>
+<title>PSA利益計算ツール</title>
 
 <style>
 body{
   font-family:system-ui;
   margin:0;
   padding:16px;
-  background:#fafafa;
+  background:#f5f5f5;
 }
-.wrap{margin:auto;}
+
+.wrap{
+  margin:auto;
+}
+
+.view-mobile .wrap{
+  width:390px;
+  margin:auto;
+}
+
+.view-pc .wrap{
+  max-width:900px;
+  margin:auto;
+}
+
+h1{
+  font-size:18px;
+  margin-bottom:10px;
+}
 
 .viewbar{
   display:flex;
   justify-content:space-between;
   margin-bottom:10px;
 }
+
 .segbtn{
   padding:8px 12px;
   border-radius:10px;
   border:none;
   background:#ddd;
 }
+
 .segbtn.active{
   background:#111;
   color:#fff;
 }
-
-.view-mobile .wrap{max-width:420px;}
-.view-pc .wrap{max-width:900px;}
-
-h1{font-size:18px;}
 
 input{
   width:100%;
@@ -92,82 +107,83 @@ button{
 <input id="target" type="number" placeholder="目標利益">
 
 <div style="display:flex;gap:8px;margin-top:8px;">
-<button id="calc" class="primary">計算</button>
-<button id="fill" class="ghost">例</button>
+<button id="calcBtn" class="primary">計算</button>
+<button id="fillBtn" class="ghost">例</button>
 </div>
 
-<div id="out" class="out">結果がここに出ます</div>
+<div id="out" class="out">ここに結果が出ます</div>
 
 </div>
 
 <script>
 function calc(){
-  const c=+card.value;
-  const g=+grading.value;
-  const n=Math.max(1,+n.value);
-  const r10=+rate10.value;
-  const p10=+p10.value;
-  const p9=+p9.value;
-  const target=+target.value;
+  const c = Number(document.getElementById('card').value) || 0;
+  const g = Number(document.getElementById('grading').value) || 0;
+  const n = Math.max(1, Number(document.getElementById('n').value) || 1);
+  const r10 = Number(document.getElementById('rate10').value) || 0;
+  const p10 = Number(document.getElementById('p10').value) || 0;
+  const p9 = Number(document.getElementById('p9').value) || 0;
+  const target = Number(document.getElementById('target').value) || 0;
 
-  const cost=c+g;
-  const diff=p10-p9;
+  const cost = c + g;
+  const diff = p10 - p9;
 
   let yMax;
-  if(diff<=0){yMax=n;}
-  else{
-    const profitAll10=n*p10-n*cost;
-    yMax=Math.floor((profitAll10-target)/diff);
-    yMax=Math.max(0,Math.min(n,yMax));
+  if(diff <= 0){
+    yMax = n;
+  } else {
+    const profitAll10 = n * p10 - n * cost;
+    yMax = Math.floor((profitAll10 - target) / diff);
+    yMax = Math.max(0, Math.min(n, yMax));
   }
 
-  const min10=n-yMax;
-  const needRate=(min10/n*100).toFixed(1);
+  const min10 = n - yMax;
+  const needRate = (min10 / n * 100).toFixed(1);
 
-  const exp10=n*(r10/100);
-  const exp9=n-exp10;
-  const expProfit=exp10*p10+exp9*p9-n*cost;
+  const exp10 = n * (r10 / 100);
+  const exp9 = n - exp10;
+  const expProfit = exp10 * p10 + exp9 * p9 - n * cost;
 
-  const ok=expProfit>=target;
+  const ok = expProfit >= target;
 
-  out.innerHTML=`
-  <div class="big ${ok?'ok':'warn'}">
-  PSA9は ${yMax}枚までOK
-  </div>
-  必要PSA10率 ${needRate}%<br>
-  期待利益 ${Math.round(expProfit)}円
+  document.getElementById('out').innerHTML = `
+    <div class="big ${ok ? 'ok':'warn'}">
+      PSA9は ${yMax}枚までOK
+    </div>
+    必要PSA10率：${needRate}%<br>
+    期待利益：${Math.round(expProfit)}円
   `;
 }
 
-calc.onclick=calc;
+// ボタン
+document.getElementById('calcBtn').addEventListener('click', calc);
 
-fill.onclick=()=>{
-  card.value=3000;
-  grading.value=2500;
-  n.value=10;
-  rate10.value=60;
-  p10.value=12000;
-  p9.value=6000;
-  target.value=0;
+document.getElementById('fillBtn').addEventListener('click', () => {
+  document.getElementById('card').value = 3000;
+  document.getElementById('grading').value = 2500;
+  document.getElementById('n').value = 10;
+  document.getElementById('rate10').value = 60;
+  document.getElementById('p10').value = 12000;
+  document.getElementById('p9').value = 6000;
+  document.getElementById('target').value = 0;
   calc();
-};
+});
 
-copyBtn.onclick=()=>{
-  navigator.clipboard.writeText(out.innerText);
+// コピー
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const text = document.getElementById('out').innerText;
+  navigator.clipboard.writeText(text);
   alert("コピーしたで👍");
-};
+});
 
-btnMobile.onclick=()=>{
-  document.body.className="view-mobile";
-  btnMobile.classList.add("active");
-  btnPC.classList.remove("active");
-};
+// 切り替え
+document.getElementById('btnMobile').addEventListener('click', () => {
+  document.body.className = "view-mobile";
+});
 
-btnPC.onclick=()=>{
-  document.body.className="view-pc";
-  btnPC.classList.add("active");
-  btnMobile.classList.remove("active");
-};
+document.getElementById('btnPC').addEventListener('click', () => {
+  document.body.className = "view-pc";
+});
 </script>
 
 </body>
