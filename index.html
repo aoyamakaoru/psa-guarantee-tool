@@ -83,6 +83,35 @@
 </div>
 
 <script>
+  <script>
+  // ===== View mode switch (default: mobile) =====
+  (function initViewMode(){
+    // 既存の .wrap を .view-shell に変える（JSでクラス付け）
+    const wrap = document.querySelector('.wrap');
+    if (wrap) wrap.classList.add('view-shell');
+
+    const btnMobile = document.getElementById('btnMobile');
+    const btnPC = document.getElementById('btnPC');
+
+    function setMode(mode){
+      document.body.classList.toggle('view-mobile', mode === 'mobile');
+      document.body.classList.toggle('view-pc', mode === 'pc');
+
+      if (btnMobile) btnMobile.classList.toggle('active', mode === 'mobile');
+      if (btnPC) btnPC.classList.toggle('active', mode === 'pc');
+
+      try { localStorage.setItem('viewMode', mode); } catch(e) {}
+    }
+
+    // デフォルトはスマホ表示。前回選択があれば復元
+    let saved = null;
+    try { saved = localStorage.getItem('viewMode'); } catch(e) {}
+    setMode(saved === 'pc' ? 'pc' : 'mobile');
+
+    btnMobile?.addEventListener('click', ()=> setMode('mobile'));
+    btnPC?.addEventListener('click', ()=> setMode('pc'));
+  })();
+</script>
   const yen = (x)=> (isFinite(x) ? Math.round(x).toLocaleString('ja-JP') : '—');
   const num = (x)=> (isFinite(x) ? (Math.round(x*100)/100).toLocaleString('ja-JP') : '—');
 
