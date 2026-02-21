@@ -6,120 +6,197 @@
 <title>PSA利益計算ツール</title>
 
 <style>
+:root{
+  --bg:#f5f5f5;
+  --card:#fff;
+  --text:#111;
+  --muted:#666;
+  --border:#ddd;
+  --primary:#111;
+  --ghost:#eee;
+}
+
 body{
   font-family:system-ui;
   margin:0;
   padding:16px;
-  background:#f5f5f5;
+  background:var(--bg);
+  color:var(--text);
 }
 
-.wrap{
-  margin:auto;
-}
+.wrap{ margin:auto; }
 
-.view-mobile .wrap{
-  width:390px;
-  margin:auto;
-}
-
-.view-pc .wrap{
-  max-width:900px;
-  margin:auto;
-}
+.view-mobile .wrap{ width:390px; margin:auto; }
+.view-pc .wrap{ max-width:900px; margin:auto; }
 
 h1{
-  font-size:18px;
-  margin-bottom:10px;
+  font-size:20px;
+  margin:0 0 10px;
 }
 
+/* 上のバー（押しやすく） */
 .viewbar{
   display:flex;
   justify-content:space-between;
-  margin-bottom:10px;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+  padding:10px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  position:sticky;
+  top:10px;
+  z-index:10;
 }
 
+.leftBtns{ display:flex; gap:8px; }
+
 .segbtn{
-  padding:8px 12px;
-  border-radius:10px;
+  padding:10px 14px;
+  border-radius:14px;
   border:none;
   background:#ddd;
+  font-size:15px;
 }
 
 .segbtn.active{
-  background:#111;
+  background:var(--primary);
   color:#fff;
 }
 
+button{
+  padding:10px 14px;
+  border-radius:14px;
+  border:none;
+  font-size:15px;
+}
+
+.primary{ background:var(--primary); color:#fff; }
+.ghost{ background:var(--ghost); }
+
+/* 入力（スマホでデカ押し） */
 input{
   width:100%;
-  padding:10px;
-  margin-bottom:8px;
-  border-radius:10px;
-  border:1px solid #ccc;
-}
-
-button{
-  padding:10px;
-  border-radius:10px;
-  border:none;
-}
-
-.primary{background:#111;color:#fff;}
-.ghost{background:#eee;}
-
-.out{
-  margin-top:10px;
   padding:14px;
+  margin-bottom:10px;
   border-radius:14px;
+  border:1px solid #ccc;
+  font-size:18px;
   background:#fff;
 }
 
-.big{
-  font-size:18px;
-  font-weight:bold;
+label{
+  display:block;
+  font-size:13px;
+  color:var(--muted);
+  margin:6px 0 6px;
 }
 
-.ok{color:green;}
-.warn{color:red;}
+.grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+}
+
+@media (max-width:720px){
+  .grid{ grid-template-columns:1fr; }
+}
+
+/* 結果 */
+.out{
+  margin-top:12px;
+  padding:14px;
+  border-radius:16px;
+  background:var(--card);
+  border:1px solid var(--border);
+}
+
+.big{
+  font-size:20px;
+  font-weight:800;
+  margin-bottom:6px;
+}
+
+.sub{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:6px;
+}
+
+.ok{ color:#0b6b2a; }
+.warn{ color:#b00020; }
+
+/* スマホ表示を“それっぽく”見せたい場合（任意感） */
+.view-mobile{
+  background:#e9e9e9;
+}
+.view-mobile .wrap{
+  background:transparent;
+}
+
 </style>
 </head>
 
 <body class="view-mobile">
-
 <div class="wrap">
 
 <h1>PSA利益計算ツール</h1>
 
 <div class="viewbar">
-  <div>
-    <button id="btnMobile" class="segbtn active">スマホ</button>
-    <button id="btnPC" class="segbtn">PC</button>
+  <div class="leftBtns">
+    <button id="btnMobile" class="segbtn active">📱 スマホ</button>
+    <button id="btnPC" class="segbtn">🖥 PC</button>
+    <button id="fillBtn" class="ghost">✨ 例</button>
   </div>
-  <button id="copyBtn">結果コピー</button>
+  <button id="copyBtn" class="primary">📋 結果コピー</button>
 </div>
 
-<input id="card" type="number" placeholder="カード代">
-<input id="grading" type="number" placeholder="鑑定費用">
-<input id="n" type="number" placeholder="枚数">
-<input id="rate10" type="number" placeholder="PSA10率%">
-<input id="p10" type="number" placeholder="PSA10買取">
-<input id="p9" type="number" placeholder="PSA9買取">
-<input id="target" type="number" placeholder="目標利益">
-
-<div style="display:flex;gap:8px;margin-top:8px;">
-<button id="calcBtn" class="primary">計算</button>
-<button id="fillBtn" class="ghost">例</button>
+<div class="grid">
+  <div>
+    <label>カード代（1枚あたり）</label>
+    <input id="card" type="number" placeholder="例: 3000">
+  </div>
+  <div>
+    <label>鑑定費用（1枚あたり）</label>
+    <input id="grading" type="number" placeholder="例: 2500">
+  </div>
+  <div>
+    <label>枚数</label>
+    <input id="n" type="number" placeholder="例: 10">
+  </div>
+  <div>
+    <label>PSA10率（%）</label>
+    <input id="rate10" type="number" placeholder="例: 60">
+  </div>
+  <div>
+    <label>PSA10買取（1枚あたり）</label>
+    <input id="p10" type="number" placeholder="例: 12000">
+  </div>
+  <div>
+    <label>PSA9買取（1枚あたり）</label>
+    <input id="p9" type="number" placeholder="例: 6000">
+  </div>
+  <div style="grid-column:1/-1">
+    <label>目標利益（合計）</label>
+    <input id="target" type="number" placeholder="例: 0（損益分岐なら0）">
+  </div>
 </div>
 
-<div id="out" class="out">ここに結果が出ます</div>
+<div id="out" class="out">入力すると自動で結果が出ます。</div>
 
 </div>
 
 <script>
+function yen(x){
+  if(!isFinite(x)) return "—";
+  return Math.round(x).toLocaleString("ja-JP");
+}
+
 function calc(){
   const c = Number(document.getElementById('card').value) || 0;
   const g = Number(document.getElementById('grading').value) || 0;
-  const n = Math.max(1, Number(document.getElementById('n').value) || 1);
+  const n = Math.max(1, Math.floor(Number(document.getElementById('n').value) || 1));
   const r10 = Number(document.getElementById('rate10').value) || 0;
   const p10 = Number(document.getElementById('p10').value) || 0;
   const p9 = Number(document.getElementById('p9').value) || 0;
@@ -128,6 +205,7 @@ function calc(){
   const cost = c + g;
   const diff = p10 - p9;
 
+  // PSA9の最大許容枚数（整数）
   let yMax;
   if(diff <= 0){
     yMax = n;
@@ -138,26 +216,31 @@ function calc(){
   }
 
   const min10 = n - yMax;
-  const needRate = (min10 / n * 100).toFixed(1);
+  const needRate = (min10 / n * 100);
 
-  const exp10 = n * (r10 / 100);
-  const exp9 = n - exp10;
+  // 期待値（端数あり）
+  const exp10 = n * (Math.max(0, Math.min(100, r10)) / 100);
+  const exp9  = n - exp10;
   const expProfit = exp10 * p10 + exp9 * p9 - n * cost;
 
   const ok = expProfit >= target;
 
   document.getElementById('out').innerHTML = `
     <div class="big ${ok ? 'ok':'warn'}">
-      PSA9は ${yMax}枚までOK
+      ${ok ? '✅' : '⚠️'} PSA9は <b>${yMax}</b>枚までOK
     </div>
-    必要PSA10率：${needRate}%<br>
-    期待利益：${Math.round(expProfit)}円
+    <div>必要PSA10枚数：<b>${min10}</b>枚（必要PSA10率：<b>${needRate.toFixed(1)}%</b>）</div>
+    <div>期待利益：<b>${yen(expProfit)}</b>円（目標：${yen(target)}円）</div>
+    <div class="sub">※入力したPSA10率は期待値（端数あり）です。実際は整数枚になります。</div>
   `;
 }
 
-// ボタン
-document.getElementById('calcBtn').addEventListener('click', calc);
+// 自動計算（入力するだけで反映）
+['card','grading','n','rate10','p10','p9','target'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', calc);
+});
 
+// 例
 document.getElementById('fillBtn').addEventListener('click', () => {
   document.getElementById('card').value = 3000;
   document.getElementById('grading').value = 2500;
@@ -169,23 +252,42 @@ document.getElementById('fillBtn').addEventListener('click', () => {
   calc();
 });
 
-// コピー
-document.getElementById('copyBtn').addEventListener('click', () => {
+// コピー（できない環境もあるのでフォールバック付き）
+document.getElementById('copyBtn').addEventListener('click', async () => {
   const text = document.getElementById('out').innerText;
-  navigator.clipboard.writeText(text);
-  alert("コピーしたで👍");
+  try{
+    await navigator.clipboard.writeText(text);
+    alert("コピーしたで👍");
+  }catch(e){
+    // フォールバック：選択してコピー
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert("コピーしたで👍");
+  }
 });
 
-// 切り替え
-document.getElementById('btnMobile').addEventListener('click', () => {
+// 表示切り替え（activeも付け替え）
+const btnMobile = document.getElementById('btnMobile');
+const btnPC = document.getElementById('btnPC');
+
+btnMobile.addEventListener('click', () => {
   document.body.className = "view-mobile";
+  btnMobile.classList.add("active");
+  btnPC.classList.remove("active");
+});
+btnPC.addEventListener('click', () => {
+  document.body.className = "view-pc";
+  btnPC.classList.add("active");
+  btnMobile.classList.remove("active");
 });
 
-document.getElementById('btnPC').addEventListener('click', () => {
-  document.body.className = "view-pc";
-});
+// 初回も計算（空でも“案内”が出る）
+calc();
 </script>
 
 </body>
 </html>
- 
