@@ -1,219 +1,174 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>最低保証買取ツール（PSA9許容枚数 & PSA10率）</title>
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif; margin:24px; line-height:1.5;}
-    .wrap{max-width:900px; margin:auto;}
-    h1{font-size:20px; margin:0 0 12px;}
-    .grid{display:grid; grid-template-columns: 1fr 1fr; gap:12px;}
-    label{display:block; font-size:13px; color:#333; margin-bottom:6px;}
-    input{width:100%; padding:10px; border:1px solid #ccc; border-radius:10px; font-size:16px;}
-    .row{background:#f7f7f7; padding:14px; border-radius:14px;}
-    .btns{display:flex; gap:10px; margin-top:12px;}
-    button{padding:10px 14px; border:0; border-radius:12px; font-size:15px; cursor:pointer;}
-    button.primary{background:#111; color:#fff;}
-    button.ghost{background:#e9e9e9;}
-    .out{margin-top:14px; padding:14px; border:1px solid #ddd; border-radius:14px;}
-    .big{font-size:20px; font-weight:700;}
-    .muted{color:#666; font-size:13px;}
-    .warn{color:#b00020; font-weight:600;}
-    .ok{color:#0b6b2a; font-weight:600;}
-    .pill{display:inline-block; padding:2px 10px; border-radius:999px; background:#eee; font-size:12px; margin-left:6px;}
-    @media (max-width:720px){ .grid{grid-template-columns:1fr;} }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PSA最低保証ツール</title>
+
+<style>
+body{
+  font-family:system-ui;
+  margin:0;
+  padding:16px;
+  background:#fafafa;
+}
+.wrap{margin:auto;}
+
+.viewbar{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+.segbtn{
+  padding:8px 12px;
+  border-radius:10px;
+  border:none;
+  background:#ddd;
+}
+.segbtn.active{
+  background:#111;
+  color:#fff;
+}
+
+.view-mobile .wrap{max-width:420px;}
+.view-pc .wrap{max-width:900px;}
+
+h1{font-size:18px;}
+
+input{
+  width:100%;
+  padding:10px;
+  margin-bottom:8px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
+button{
+  padding:10px;
+  border-radius:10px;
+  border:none;
+}
+
+.primary{background:#111;color:#fff;}
+.ghost{background:#eee;}
+
+.out{
+  margin-top:10px;
+  padding:14px;
+  border-radius:14px;
+  background:#fff;
+}
+
+.big{
+  font-size:18px;
+  font-weight:bold;
+}
+
+.ok{color:green;}
+.warn{color:red;}
+</style>
 </head>
-<body>
+
+<body class="view-mobile">
+
 <div class="wrap">
-  <h1>最低保証買取ツール（PSA9が何枚までなら利益が出る？ + PSA10率入力）</h1>
 
-  <div class="grid">
-    <div class="row">
-      <label>カード代（1枚あたり）</label>
-      <input id="card" type="number" inputmode="decimal" value="3000" min="0" />
-    </div>
-    <div class="row">
-      <label>鑑定費用（1枚あたり）</label>
-      <input id="grading" type="number" inputmode="decimal" value="2500" min="0" />
-    </div>
+<h1>PSA利益計算ツール</h1>
 
-    <div class="row">
-      <label>枚数</label>
-      <input id="n" type="number" inputmode="numeric" value="10" min="1" step="1" />
-    </div>
-    <div class="row">
-      <label>PSA10率（%）</label>
-      <input id="rate10" type="number" inputmode="decimal" value="60" min="0" max="100" step="0.1" />
-      <div class="muted">期待値として「10枚数/9枚数」を表示します（端数あり）</div>
-    </div>
-
-    <div class="row">
-      <label>PSA10だった時の買取金額（1枚あたり）</label>
-      <input id="p10" type="number" inputmode="decimal" value="12000" min="0" />
-    </div>
-    <div class="row">
-      <label>PSA9だった時の買取金額（1枚あたり）</label>
-      <input id="p9" type="number" inputmode="decimal" value="6000" min="0" />
-    </div>
-
-    <div class="row">
-      <label>目標利益（合計）</label>
-      <input id="target" type="number" inputmode="decimal" value="0" />
-      <div class="muted">0にすると「損益分岐でOK」</div>
-    </div>
-    <div class="row">
-      <label>（任意）利益入力の使い方</label>
-      <div class="muted">
-        「最低でも利益○円欲しい」→ここに入れる<br>
-        「とにかく赤字回避」→0
-      </div>
-    </div>
+<div class="viewbar">
+  <div>
+    <button id="btnMobile" class="segbtn active">スマホ</button>
+    <button id="btnPC" class="segbtn">PC</button>
   </div>
+  <button id="copyBtn">結果コピー</button>
+</div>
 
-  <div class="btns">
-    <button class="primary" id="calc">計算</button>
-    <button class="ghost" id="fill">例を入れる</button>
-  </div>
+<input id="card" type="number" placeholder="カード代">
+<input id="grading" type="number" placeholder="鑑定費用">
+<input id="n" type="number" placeholder="枚数">
+<input id="rate10" type="number" placeholder="PSA10率%">
+<input id="p10" type="number" placeholder="PSA10買取">
+<input id="p9" type="number" placeholder="PSA9買取">
+<input id="target" type="number" placeholder="目標利益">
 
-  <div class="out" id="out">
-    <div class="muted">「計算」を押すと結果が出ます。</div>
-  </div>
+<div style="display:flex;gap:8px;margin-top:8px;">
+<button id="calc" class="primary">計算</button>
+<button id="fill" class="ghost">例</button>
+</div>
+
+<div id="out" class="out">結果がここに出ます</div>
+
 </div>
 
 <script>
-  <script>
-  // ===== View mode switch (default: mobile) =====
-  (function initViewMode(){
-    // 既存の .wrap を .view-shell に変える（JSでクラス付け）
-    const wrap = document.querySelector('.wrap');
-    if (wrap) wrap.classList.add('view-shell');
+function calc(){
+  const c=+card.value;
+  const g=+grading.value;
+  const n=Math.max(1,+n.value);
+  const r10=+rate10.value;
+  const p10=+p10.value;
+  const p9=+p9.value;
+  const target=+target.value;
 
-    const btnMobile = document.getElementById('btnMobile');
-    const btnPC = document.getElementById('btnPC');
+  const cost=c+g;
+  const diff=p10-p9;
 
-    function setMode(mode){
-      document.body.classList.toggle('view-mobile', mode === 'mobile');
-      document.body.classList.toggle('view-pc', mode === 'pc');
-
-      if (btnMobile) btnMobile.classList.toggle('active', mode === 'mobile');
-      if (btnPC) btnPC.classList.toggle('active', mode === 'pc');
-
-      try { localStorage.setItem('viewMode', mode); } catch(e) {}
-    }
-
-    // デフォルトはスマホ表示。前回選択があれば復元
-    let saved = null;
-    try { saved = localStorage.getItem('viewMode'); } catch(e) {}
-    setMode(saved === 'pc' ? 'pc' : 'mobile');
-
-    btnMobile?.addEventListener('click', ()=> setMode('mobile'));
-    btnPC?.addEventListener('click', ()=> setMode('pc'));
-  })();
-</script>
-  const yen = (x)=> (isFinite(x) ? Math.round(x).toLocaleString('ja-JP') : '—');
-  const num = (x)=> (isFinite(x) ? (Math.round(x*100)/100).toLocaleString('ja-JP') : '—');
-
-  function clamp(x, min, max){ return Math.max(min, Math.min(max, x)); }
-  function clampInt(x, min, max){
-    x = Math.floor(x);
-    if (x < min) return min;
-    if (x > max) return max;
-    return x;
+  let yMax;
+  if(diff<=0){yMax=n;}
+  else{
+    const profitAll10=n*p10-n*cost;
+    yMax=Math.floor((profitAll10-target)/diff);
+    yMax=Math.max(0,Math.min(n,yMax));
   }
 
-  function calc(){
-    const c = Number(document.getElementById('card').value);
-    const g = Number(document.getElementById('grading').value);
-    const n = Math.max(1, Math.floor(Number(document.getElementById('n').value)));
-    const r10 = clamp(Number(document.getElementById('rate10').value), 0, 100);
-    const p10 = Number(document.getElementById('p10').value);
-    const p9  = Number(document.getElementById('p9').value);
-    const target = Number(document.getElementById('target').value);
+  const min10=n-yMax;
+  const needRate=(min10/n*100).toFixed(1);
 
-    const cost = c + g;
-    const diff = p10 - p9;
+  const exp10=n*(r10/100);
+  const exp9=n-exp10;
+  const expProfit=exp10*p10+exp9*p9-n*cost;
 
-    // 全部10だった場合の利益
-    const profitAll10 = n * p10 - n * cost;
+  const ok=expProfit>=target;
 
-    // 9の最大許容枚数（整数）
-    let yMax;
-    if (diff <= 0){
-      yMax = n;
-    } else {
-      yMax = Math.floor((profitAll10 - target) / diff);
-      yMax = clampInt(yMax, 0, n);
-    }
+  out.innerHTML=`
+  <div class="big ${ok?'ok':'warn'}">
+  PSA9は ${yMax}枚までOK
+  </div>
+  必要PSA10率 ${needRate}%<br>
+  期待利益 ${Math.round(expProfit)}円
+  `;
+}
 
-    const min10 = n - yMax;                 // 利益達成に必要な最低10枚数（整数）
-    const needRate10 = (min10 / n) * 100;   // 必要10率（%）
+calc.onclick=calc;
 
-    // yMax枚9、残り10のときの利益
-    const profitAtYMax = (n - yMax) * p10 + yMax * p9 - n * cost;
-
-    // PSA10率入力から期待値（端数あり）
-    const exp10 = n * (r10 / 100);
-    const exp9  = n - exp10;
-
-    // 期待値での利益（端数あり）
-    const expProfit = exp10 * p10 + exp9 * p9 - n * cost;
-
-    // 期待値ベースで赤字回避できそうか（目標利益も含める）
-    const expOk = expProfit >= target;
-
-    const out = document.getElementById('out');
-    out.innerHTML = `
-      <div class="big">
-        PSA9は <span class="${profitAtYMax >= target ? 'ok':'warn'}">${yMax}枚</span> までなら目標利益OK
-        <span class="pill">必要PSA10枚数 ${min10}枚 / 必要PSA10率 ${num(needRate10)}%</span>
-      </div>
-      <div class="muted">（枚数n=${n}のとき。「9が${yMax}枚」=「10が${min10}枚」）</div>
-
-      <hr style="border:0;border-top:1px solid #eee;margin:12px 0;">
-
-      <div>
-        <b>PSA10率 ${num(r10)}%</b> の期待値 → PSA10: <b>${num(exp10)}枚</b> / PSA9: <b>${num(exp9)}枚</b>
-        <div class="${expOk ? 'ok':'warn'}" style="margin-top:6px;">
-          期待値での利益: ${yen(expProfit)}円（目標: ${yen(target)}円）
-        </div>
-      </div>
-
-      <hr style="border:0;border-top:1px solid #eee;margin:12px 0;">
-
-      <div class="muted">
-        1枚あたり原価: ${yen(cost)}円 / 10-9差: ${yen(diff)}円<br>
-        全部10の利益: ${yen(profitAll10)}円 / 全部9の利益: ${yen(n * p9 - n * cost)}円<br>
-        「9が${yMax}枚」のときの利益: <b>${yen(profitAtYMax)}円</b>
-      </div>
-
-      ${diff > 0
-        ? `<div class="muted">※ 9が1枚増えるごとに利益が ${yen(diff)}円 減ります</div>`
-        : `<div class="muted">※ PSA9が同額以上なので、9が増えても利益は減りません</div>`
-      }
-      <div class="muted">※「期待値」は端数を含む概算です（実際は整数の枚数になります）</div>
-    `;
-  }
-
-  document.getElementById('calc').addEventListener('click', calc);
-  document.getElementById('fill').addEventListener('click', ()=>{
-    document.getElementById('card').value = 3000;
-    document.getElementById('grading').value = 2500;
-    document.getElementById('n').value = 10;
-    document.getElementById('rate10').value = 60;
-    document.getElementById('p10').value = 12000;
-    document.getElementById('p9').value = 6000;
-    document.getElementById('target').value = 0;
-    calc();
-  });
-
-  // 入力したら即再計算（好みで外してOK）
-  ["card","grading","n","rate10","p10","p9","target"].forEach(id=>{
-    document.getElementById(id).addEventListener('input', calc);
-  });
-
+fill.onclick=()=>{
+  card.value=3000;
+  grading.value=2500;
+  n.value=10;
+  rate10.value=60;
+  p10.value=12000;
+  p9.value=6000;
+  target.value=0;
   calc();
+};
+
+copyBtn.onclick=()=>{
+  navigator.clipboard.writeText(out.innerText);
+  alert("コピーしたで👍");
+};
+
+btnMobile.onclick=()=>{
+  document.body.className="view-mobile";
+  btnMobile.classList.add("active");
+  btnPC.classList.remove("active");
+};
+
+btnPC.onclick=()=>{
+  document.body.className="view-pc";
+  btnPC.classList.add("active");
+  btnMobile.classList.remove("active");
+};
 </script>
+
 </body>
 </html>
