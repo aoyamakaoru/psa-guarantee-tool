@@ -134,7 +134,6 @@ label{
 .view-mobile .wrap{
   background:transparent;
 }
-
 </style>
 </head>
 
@@ -147,7 +146,6 @@ label{
   <div class="leftBtns">
     <button id="btnMobile" class="segbtn active">📱 スマホ</button>
     <button id="btnPC" class="segbtn">🖥 PC</button>
-    <button id="fillBtn" class="ghost">✨ 例</button>
   </div>
   <button id="copyBtn" class="primary">📋 結果コピー</button>
 </div>
@@ -199,7 +197,7 @@ function calc(){
   const n = Math.max(1, Math.floor(Number(document.getElementById('n').value) || 1));
   const r10 = Number(document.getElementById('rate10').value) || 0;
   const p10 = Number(document.getElementById('p10').value) || 0;
-  const p9 = Number(document.getElementById('p9').value) || 0;
+  const p9  = Number(document.getElementById('p9').value) || 0;
   const target = Number(document.getElementById('target').value) || 0;
 
   const cost = c + g;
@@ -219,9 +217,14 @@ function calc(){
   const needRate = (min10 / n * 100);
 
   // 期待値（端数あり）
-  const exp10 = n * (Math.max(0, Math.min(100, r10)) / 100);
+  const r10c = Math.max(0, Math.min(100, r10));
+  const exp10 = n * (r10c / 100);
   const exp9  = n - exp10;
-  const expProfit = exp10 * p10 + exp9 * p9 - n * cost;
+
+  // 追加：売上・経費（合計）
+  const revenue = exp10 * p10 + exp9 * p9;  // 売上（期待値・合計）
+  const expense = n * cost;                 // 経費（合計）
+  const expProfit = revenue - expense;      // 期待利益（合計）
 
   const ok = expProfit >= target;
 
@@ -230,26 +233,16 @@ function calc(){
       ${ok ? '✅' : '⚠️'} PSA9は <b>${yMax}</b>枚までOK
     </div>
     <div>必要PSA10枚数：<b>${min10}</b>枚（必要PSA10率：<b>${needRate.toFixed(1)}%</b>）</div>
+    <div>売上（期待）：<b>${yen(revenue)}</b>円</div>
+    <div>経費（合計）：<b>${yen(expense)}</b>円</div>
     <div>期待利益：<b>${yen(expProfit)}</b>円（目標：${yen(target)}円）</div>
-    <div class="sub">※入力したPSA10率は期待値（端数あり）です。実際は整数枚になります。</div>
+    <div class="sub">※売上はPSA10率の期待値（端数あり）です。実際は整数枚になります。</div>
   `;
 }
 
 // 自動計算（入力するだけで反映）
 ['card','grading','n','rate10','p10','p9','target'].forEach(id=>{
   document.getElementById(id).addEventListener('input', calc);
-});
-
-// 例
-document.getElementById('fillBtn').addEventListener('click', () => {
-  document.getElementById('card').value = 3000;
-  document.getElementById('grading').value = 2500;
-  document.getElementById('n').value = 10;
-  document.getElementById('rate10').value = 60;
-  document.getElementById('p10').value = 12000;
-  document.getElementById('p9').value = 6000;
-  document.getElementById('target').value = 0;
-  calc();
 });
 
 // コピー（できない環境もあるのでフォールバック付き）
@@ -259,7 +252,6 @@ document.getElementById('copyBtn').addEventListener('click', async () => {
     await navigator.clipboard.writeText(text);
     alert("コピーしたで👍");
   }catch(e){
-    // フォールバック：選択してコピー
     const ta = document.createElement('textarea');
     ta.value = text;
     document.body.appendChild(ta);
@@ -285,7 +277,7 @@ btnPC.addEventListener('click', () => {
   btnMobile.classList.remove("active");
 });
 
-// 初回も計算（空でも“案内”が出る）
+// 初回も計算
 calc();
 </script>
 
